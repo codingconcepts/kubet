@@ -2,12 +2,27 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"log"
 	"strings"
 	"text/template"
 
 	"github.com/spf13/cobra"
+)
+
+var (
+	//go:embed templates/deployment.yaml.tmpl
+	deployment         string
+	deploymentTemplate = template.Must(template.New("deployment").Parse(deployment))
+
+	//go:embed templates/service.yaml.tmpl
+	service         string
+	serviceTemplate = template.Must(template.New("service").Parse(service))
+
+	//go:embed templates/namespace.yaml.tmpl
+	namespace         string
+	namespaceTemplate = template.Must(template.New("namespace").Parse(namespace))
 )
 
 func main() {
@@ -43,23 +58,18 @@ func main() {
 }
 
 func runNamespace(cmd *cobra.Command, args []string) {
-	run("templates/namespace.yaml.tmpl", args)
+	run(namespaceTemplate, args)
 }
 
 func runDeployment(cmd *cobra.Command, args []string) {
-	run("templates/deployment.yaml.tmpl", args)
+	run(deploymentTemplate, args)
 }
 
 func runService(cmd *cobra.Command, args []string) {
-	run("templates/service.yaml.tmpl", args)
+	run(serviceTemplate, args)
 }
 
-func run(path string, args []string) {
-	t, err := template.ParseFiles(path)
-	if err != nil {
-		log.Fatalf("error parsing template: %v", err)
-	}
-
+func run(t *template.Template, args []string) {
 	buf := &bytes.Buffer{}
 	if err := t.Execute(buf, argsToMap(args)); err != nil {
 		log.Fatalf("error running template: %v", err)
