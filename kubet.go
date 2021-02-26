@@ -31,19 +31,25 @@ func main() {
 	namespaceCmd := &cobra.Command{
 		Use:   "namespace",
 		Short: "Create a namespace manifest template.",
-		Run:   runNamespace,
+		Run: func(cmd *cobra.Command, args []string) {
+			run(namespaceTemplate, args)
+		},
 	}
 
 	deploymentCmd := &cobra.Command{
 		Use:   "deployment",
 		Short: "Create a deployment manifest template.",
-		Run:   runDeployment,
+		Run: func(cmd *cobra.Command, args []string) {
+			run(deploymentTemplate, args)
+		},
 	}
 
 	serviceCmd := &cobra.Command{
 		Use:   "service",
 		Short: "Create a service manifest template.",
-		Run:   runService,
+		Run: func(cmd *cobra.Command, args []string) {
+			run(serviceTemplate, args)
+		},
 	}
 
 	rootCmd.AddCommand(
@@ -55,18 +61,6 @@ func main() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("error executing command: %v", err)
 	}
-}
-
-func runNamespace(cmd *cobra.Command, args []string) {
-	run(namespaceTemplate, args)
-}
-
-func runDeployment(cmd *cobra.Command, args []string) {
-	run(deploymentTemplate, args)
-}
-
-func runService(cmd *cobra.Command, args []string) {
-	run(serviceTemplate, args)
 }
 
 func run(t *template.Template, args []string) {
